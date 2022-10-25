@@ -55,7 +55,7 @@ hitBomb (player, bomb)
 
  create ()
     {
-        //Se sobre ponen en el orden que se le declaran.Siempre poner primero al fondo....
+        //Se sobreponen en el orden que se le declaran.Siempre poner primero al fondo....
         this.add.image(400, 300, 'sky');
         this.score =0;
         this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });

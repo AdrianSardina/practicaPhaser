@@ -19,7 +19,7 @@ export default function Game() {
            //     gravity: { y: 300 }
             }
         },
-        scene:[Dude]
+        scene:[Arkanoid]
         // scene: {
         //     preload: preload,
         //     create: create
