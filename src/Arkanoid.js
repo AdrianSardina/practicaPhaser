@@ -1,8 +1,9 @@
 import Phaser from "phaser";
+import { Levels } from "./Levels";
 class Arkanoid extends Phaser.Scene
 {
     constructor(){
-        super("principal")
+        super({ key: 'game' });
     }
     score=null;
     platform = null;
@@ -10,8 +11,8 @@ class Arkanoid extends Phaser.Scene
     ball = null;
     Bricks = null;
     lives= null;
-    currentLevel =null;
-
+    levels = null;
+    
     //-----------------Functions---------//
     impactBrick(player,brick)
     {
@@ -32,10 +33,17 @@ class Arkanoid extends Phaser.Scene
             ball.setVelocityX(15 *relativeImpact);
         }
     }
+    resetBallposition()
+    {
+        this.ball.setData('glue', true);
+        this.ball.x = this.platform.x;
+        this.ball.y=536;
+        this.ball.setVelocityY(0);
+    }
     newLevel(){
         this.Bricks = this.physics.add.staticGroup({
             key: ['greenBrick','orangeBrick','blueBrick','yellowBrick'],
-            repeat: 2,
+            repeat: 1,
             gridAlign:
             {
                 width: 5,
@@ -48,13 +56,11 @@ class Arkanoid extends Phaser.Scene
             }
             
             
+
         });
         this.physics.add.collider(this.ball, this.Bricks,this.impactBrick,null,this);
         
-        this.ball.setData('glue', true);
-        this.ball.x = this.platform.x;
-        this.ball.y=536;
-        this.ball.setVelocityY(0);
+        
     }
      //-------------Preload-----------//
     preload(){
@@ -65,33 +71,20 @@ class Arkanoid extends Phaser.Scene
         this.load.image('orangeBrick','../img/blockOrange.png')
         this.load.image('blueBrick','../img/blockBlue.png')
         this.load.image('yellowBrick','../img/blockYellow.png')
+        this.load.image('pinkBrick','../img/blockPink.png')
     } 
         //-------------Create-----------// 
     create(){
+       this.levels = new Levels(this)
         this.lives = 3;
         this.score=0;
-        this.currentLevel=1;
+        
         this.add.image(400,300,'fondo');
         this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
         this.platform = this.physics.add.image(500,560,'plattform');
         this.platform.body.allowGravity =false;
-        this.Bricks = this.physics.add.staticGroup({
-            key: ['greenBrick','orangeBrick','blueBrick','yellowBrick'],
-            repeat: 5,
-            gridAlign:
-            {
-               
-                width: 8,
-                height: 3,
-                cellWidth: 70,
-                cellHeight: 34,
-                x: 125,
-                y: 100             
-            }
-            
-            
-        });
-        var bomb = this.Bricks.create(500, 500, 'greenBrick');
+       
+        
         
         
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -104,6 +97,8 @@ class Arkanoid extends Phaser.Scene
         this.ball.setVelocity(Phaser.Math.Between(60, 150),0)
         this.ball.setData('glue', true);
         this.physics.add.collider(this.ball, this.platform,this.impactPlatform,null,this);
+        
+        this.Bricks= this.levels.CreateLevelOne();    
         this.physics.add.collider(this.ball, this.Bricks,this.impactBrick,null,this);
     }
          //-------------Update-----------//
@@ -111,11 +106,11 @@ class Arkanoid extends Phaser.Scene
 
         if (this.cursors.left.isDown)
         {
-            this.platform.setVelocityX(-500);     
+            this.platform.setVelocityX(-600);     
         }
         else if (this.cursors.right.isDown)
         {
-            this.platform.setVelocityX(500);       
+            this.platform.setVelocityX(600);       
         }
         else
         {
@@ -133,8 +128,9 @@ class Arkanoid extends Phaser.Scene
            
         if(this.Bricks.countActive() == 0)
         {
-            this.newLevel();
-           
+            this.Bricks = this.levels.CreateLevelTwo();
+            this.physics.add.collider(this.ball, this.Bricks,this.impactBrick,null,this);
+            this.resetBallposition();
         }  
         if(this.ball.y >= 580 )
         {
